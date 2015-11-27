@@ -1,5 +1,5 @@
 ##About
-The kids bought a handful of old scool 4 digit 7 segment bubble displays.
+The kids bought a handful of old school 4 digit 7 segment bubble displays.
 We decided to drive them with a shift register hooked up to a Raspberry Pi and some basic Python code
 
 

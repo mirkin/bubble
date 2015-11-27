@@ -2,6 +2,39 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4 background=dark
 
 '''
+GPIO pins are by BCM
+
+Shift register 74HC595N Other Pins
+8                   Connected to ground
+9                   Serial Data Output not used
+10                  Master Reset (active LOW) so kept high +3V3
+13                  Output Enable (active LOW) so kept low with GND
+16                  +3V3
+
+Output of shift register to bubble display pin number
+[wiring info]
+
+Q0                   2
+Q1                   3
+Q2                   7
+Q3                   8
+Q4                   9
+Q5                   11
+Q6                   12
+Q7                   5
+
+GPIO to bubble display to select digit
+G5                  1
+G6                  10
+G13                 4
+G19                 6
+
+GPIO to shift register
+G17                 11 Shift Register Clock Input
+G27                 12 Storage Register Clock Input
+G22                 14 Serial Data Input
+
+Output of shift register to segment of digit
 0  dot              DP
 1  top              A
 2  top right        B
@@ -10,7 +43,6 @@
 5  middle           G
 6  bottom right     C
 7  bottom left      E
-8
 '''
 
 font={
@@ -70,7 +102,7 @@ for i in PIN_DIGIT:
 
 def cleanup( ):
     print('Terminating')
-    GPIO.cleanup() 
+    GPIO.cleanup()
 
 atexit.register(cleanup)
 signal.signal(signal.SIGTERM,cleanup)
@@ -89,14 +121,14 @@ def set_digit(d):
 def clear_digit():
     for i in PIN_DIGIT:
         GPIO.output(i,1)
-    
+
 def show_string(s):
     for l in range(4):
         clear_digit()
         set_segments(font[s[l]])
         set_digit(l)
         time.sleep(0.0001)
-        
+
 class display_thread (threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
