@@ -2,6 +2,9 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4 background=dark
 
 '''
+Scroll message on a HP QDSP-6064 Bubble display using an
+SN74HC595 Shift Register and 7 GPIO pins on a RaspberyPi
+
 GPIO pins are by BCM
 
 Shift register 74HC595N Other Pins
@@ -45,6 +48,13 @@ Output of shift register to segment of digit
 7  bottom left      E
 '''
 
+import RPi.GPIO as GPIO
+import time
+import threading
+import atexit
+import signal
+import argparse
+
 font={
         'a':0b11101110,
         'b':0b11111000,
@@ -87,7 +97,6 @@ font={
         }
 message='playing with a retro bubble display on a raspberry pi 0123456789 ...'
 word='play'
-import RPi.GPIO as GPIO,time,threading,atexit,signal
 PIN_DATA=22
 PIN_LATCH=27
 PIN_CLOCK=17
@@ -97,6 +106,13 @@ GPIO.setup(PIN_DATA,GPIO.OUT)
 GPIO.setup(PIN_LATCH,GPIO.OUT)
 GPIO.setup(PIN_CLOCK,GPIO.OUT)
 
+parser=argparse.ArgumentParser(description='Bubble Display Scroller')
+parser.add_argument("-ds",help="Digit Select GPIO [G] or Shift Register [SR]",
+                    choices=["G","SR"],default="G")
+parser.add_argument("--message","-m",help="Message to scroll",default=message)
+args=parser.parse_args()
+message=args.message
+print(args.ds)
 for i in PIN_DIGIT:
     GPIO.setup(i,GPIO.OUT,initial=GPIO.HIGH)
 
