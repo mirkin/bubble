@@ -5,6 +5,10 @@
 Scroll message on a HP QDSP-6064 Bubble display using an
 SN74HC595 Shift Register and 7 GPIO pins on a RaspberyPi
 
+Or use a second shift register to control the cathodes for
+the digits with -ds SR
+
+
 GPIO pins are by BCM
 
 Shift register 74HC595N Other Pins
@@ -124,12 +128,13 @@ atexit.register(cleanup)
 signal.signal(signal.SIGTERM,cleanup)
 
 def set_segments(byte):
+    #print(bin(byte))
     GPIO.output(PIN_LATCH, 0)
     for x in range(8):
         GPIO.output(PIN_DATA, (byte >> x) & 1)
         GPIO.output(PIN_CLOCK, 1)
         GPIO.output(PIN_CLOCK, 0)
-    GPIO.output(PIN_LATCH, 1)
+    #GPIO.output(PIN_LATCH, 1)
 
 def set_digit(d):
     GPIO.output(PIN_DIGIT[d],0)
@@ -140,10 +145,17 @@ def clear_digit():
 
 def show_string(s):
     for l in range(4):
-        clear_digit()
-        set_segments(font[s[l]])
-        set_digit(l)
-        time.sleep(0.0001)
+        if args.ds=='G':
+            clear_digit()
+            set_segments(font[s[l]])
+            GPIO.output(PIN_LATCH,1)
+            set_digit(l)
+            time.sleep(0.0001)
+        else:
+            set_segments(~(128>>l) & 255)
+            set_segments(font[s[l]])
+            GPIO.output(PIN_LATCH,1)
+            time.sleep(0.0001)
 
 class display_thread (threading.Thread):
     def __init__(self):
