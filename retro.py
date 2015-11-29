@@ -100,7 +100,7 @@ font={
         ' ':0b00000000,
         }
 message='playing with a retro bubble display on a raspberry pi 0123456789 ...'
-word='play'
+word='playing.'
 PIN_DATA=22
 PIN_LATCH=27
 PIN_CLOCK=17
@@ -114,6 +114,8 @@ parser=argparse.ArgumentParser(description='Bubble Display Scroller')
 parser.add_argument("-ds",help="Digit Select GPIO [G] or Shift Register [SR]",
                     choices=["G","SR"],default="G")
 parser.add_argument("--message","-m",help="Message to scroll",default=message)
+parser.add_argument("--digits","-d",help="How many digits 4 or 8",default=4,
+                    choices=[4,8],type=int)
 args=parser.parse_args()
 message=args.message
 print(args.ds)
@@ -144,7 +146,7 @@ def clear_digit():
         GPIO.output(i,1)
 
 def show_string(s):
-    for l in range(4):
+    for l in range(args.digits):
         if args.ds=='G':
             clear_digit()
             set_segments(font[s[l]])
@@ -170,7 +172,7 @@ time.sleep(5)
 try:
     while True:
         for x in range(len(message)):
-            word=(message+'    ')[x:]
+            word=(message+'        ')[x:]
             time.sleep(0.2)
 finally:
     cleanup()
