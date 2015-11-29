@@ -116,8 +116,14 @@ parser.add_argument("-ds",help="Digit Select GPIO [G] or Shift Register [SR]",
 parser.add_argument("--message","-m",help="Message to scroll",default=message)
 parser.add_argument("--digits","-d",help="How many digits 4 or 8",default=4,
                     choices=[4,8],type=int)
+parser.add_argument("--firstMessage","-fm",help="message displayed before scrolling"
+                    ,default="0bubble0")
 args=parser.parse_args()
-message=args.message
+#message=('{:^'+str(args.digits)+'}').format(args.message)
+#print'{:^'+str(args.digits)+'}'
+#print ('{:^'+str(args.digits)+'}').format(args.message)
+message=args.message.center(len(args.message)+2*(1+args.digits),' ')
+word=args.firstMessage
 print(args.ds)
 for i in PIN_DIGIT:
     GPIO.setup(i,GPIO.OUT,initial=GPIO.HIGH)
@@ -171,8 +177,8 @@ myThread.start()
 time.sleep(5)
 try:
     while True:
-        for x in range(len(message)):
-            word=(message+'        ')[x:]
+        for x in range(len(message)-args.digits):
+            word=message[x:]
             time.sleep(0.2)
 finally:
     cleanup()
