@@ -11,24 +11,30 @@ the digits with -ds SR
 
 GPIO pins are by BCM
 
-Shift register 74HC595N Other Pins
-8                   Connected to ground
-9                   Serial Data Output not used
-10                  Master Reset (active LOW) so kept high +3V3
-13                  Output Enable (active LOW) so kept low with GND
-16                  +3V3
+First Shift register 74HC595N used to select segments
+
+74HC595 Pin
+    8           Connected to ground
+    9           Serial Data Output to pin 14 of next shift register if used
+    10          Master Reset (active LOW) so kept high +3V3
+    11          Shift Register Clock input GPIO17 on Pi
+    12          Storage Register Clock Input GPIO27 on Pi
+    13          Output Enable (active LOW) so kept low with GND
+    14          Serial Data Input GPIO22 on Pi
+    16          +3V3
 
 Output of shift register to bubble display pin number
 [wiring info]
 
-Q0                   2
-Q1                   3
-Q2                   7
-Q3                   8
-Q4                   9
-Q5                   11
-Q6                   12
-Q7                   5
+74HC595 Pin     74HC595 Output      QDSP-6064 Pin
+    15              Q0                   2
+    1               Q1                   3
+    2               Q2                   7
+    3               Q3                   8
+    4               Q4                   9
+    5               Q5                   11
+    6               Q6                   12
+    7               Q7                   5
 
 GPIO to bubble display to select digit
 G5                  1
@@ -36,20 +42,39 @@ G6                  10
 G13                 4
 G19                 6
 
+Alternatively use another shift register
+
+74HC595 Pin     74HC595 Output      QDSP-6064 Pin
+    15              Q0                  1
+    1               Q1                  10
+    2               Q2                  4
+    3               Q3                  6
+
+Drive another bubble display with the rest of the outputs of the second
+shift register
+
+74HC595 Pin     74HC595 Output      QDSP-6064 Pin
+    4               Q4                  1
+    5               Q5                  10
+    6               Q6                  4
+    7               Q7                  6
+
 GPIO to shift register
 G17                 11 Shift Register Clock Input
 G27                 12 Storage Register Clock Input
 G22                 14 Serial Data Input
 
 Output of shift register to segment of digit
-0  dot              DP
-1  top              A
-2  top right        B
-3  top left         F
-4  bottom           D
-5  middle           G
-6  bottom right     C
-7  bottom left      E
+
+74HC595 Pin          Segment                  QDSP-6064 Pin
+    0           dot              DP              5
+    1           top              A               12
+    2           top right        B               11
+    3           top left         F               9
+    4           bottom           D               8
+    5           middle           G               7
+    6           bottom right     C               3
+    7           bottom left      E               2
 '''
 
 import RPi.GPIO as GPIO
