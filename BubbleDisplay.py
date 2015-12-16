@@ -135,7 +135,11 @@ class BubbleDisplay(object):
         digits          -- How many characters 4 or 8 (default 4)
         digit_select    -- use GPIO or another Shift Register to select
                            digits (default 'G')
+        static_message  -- non scrolling message
+        scroll_message  -- text to scroll
         '''
+        self.scrolling=False
+        self.keep_thread=True
         self.message='playing with a retro bubble display on a raspberry pi 0123456789 ...'
         self.word='playing.'
         self.PIN_DATA=PIN_DATA
@@ -153,17 +157,27 @@ class BubbleDisplay(object):
             self.digit_select=qwargs.get('digit_select')
         else:
             self.digit_select=4
+        if qwargs.has_key('static_message'):
+            self.static_message=qwargs.get('static_message')
+        else:
+            self.static_message='gurgleapps.com'
+        if qwargs.has_key('scroll_message'):
+            self.scroll_message=qwargs.get('scroll_message')
+        else:
+            self.scroll_message='playing gurgleapps.com'
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(PIN_DATA,GPIO.OUT)
         GPIO.setup(PIN_LATCH,GPIO.OUT)
         GPIO.setup(PIN_CLOCK,GPIO.OUT)
-
         if self.digit_select=='G':
             for i in PIN_DIGIT:
                 GPIO.setup(i,GPIO.OUT,initial=GPIO.HIGH)
+        self.my_thread=threading.Thread(target=self.display_loop)
+        self.my_thread.start()
 
     def cleanup(self):
         print('BubbleDisplay Terminating')
+        self.keep_thread=False
         GPIO.cleanup()
 
     def set_segments(self,byte):
@@ -197,6 +211,21 @@ class BubbleDisplay(object):
                 self.set_segments(self.font[s[l]])
                 GPIO.output(self.PIN_LATCH,1)
                 time.sleep(0.0001)
+
+    def show_static_message(self,m):
+        self.scrolling=False
+        self.static_message=m
+
+    def show_scroll_message(self,m):
+        self.scrolling=True
+        self.scroll_message=m
+
+    def display_loop(self):
+        while self.keep_thread:
+            if self.scrolling:
+                self.show_string(self.static_message)
+            else:
+                self.show_string(self.scroll_message)
 '''
 
     class display_thread (threading.Thread):

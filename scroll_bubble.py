@@ -7,6 +7,7 @@ import argparse
 import BubbleDisplay as retro
 import atexit
 import signal
+import time
 
 message='playing with a retro bubble display on a raspberry pi 0123456789 ...'
 parser=argparse.ArgumentParser(description='Bubble Display Scroller')
@@ -29,5 +30,6 @@ def cleanup( ):
 
 atexit.register(cleanup)
 signal.signal(signal.SIGTERM,cleanup)
-while True:
-    my_bubble.show_string(word)
+my_bubble.show_static_message(word)
+time.sleep(3)
+my_bubble.show_scroll_message(message)
